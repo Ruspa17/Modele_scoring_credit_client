@@ -2,6 +2,5 @@ streamlit
 pillow
 pandas
 numpy
-pickle
 plotly
 shap
