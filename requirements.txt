@@ -1,6 +1,6 @@
 streamlit
 pillow
 pandas
-numpy
+numpy==1.20
 plotly
 shap
