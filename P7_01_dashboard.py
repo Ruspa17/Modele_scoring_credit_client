@@ -11,6 +11,7 @@ import shap
 COLOR_BR_r = ['dodgerblue', 'indianred']
 COLOR_BR =['#EF553B', '#00CC96']
 
+@st.cache
 def histogram(df, x='str', legend=True, client=None):
     '''client = [df_test, input_client] '''
     if x == "TARGET":

@@ -1,0 +1,7 @@
+streamlit
+PIL
+pandas
+numpy
+pickle
+plotly
+shap
