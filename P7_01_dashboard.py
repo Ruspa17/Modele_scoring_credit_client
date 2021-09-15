@@ -47,8 +47,8 @@ def histogram(df, x='str', legend=True, client=None):
 
 ### Data ###
 
-train = pd.read_csv('../Dataset/train_small.csv', nrows = 100000)
-test = pd.read_csv('../Dataset/test_small.csv', nrows = 10000)
+train = pd.read_csv('../Dataset/train_small.csv', nrows = 10000)
+test = pd.read_csv('../Dataset/test_small.csv', nrows = 1000)
 test_ID = test['SK_ID_CURR']
 test_features = test.drop(columns=['SK_ID_CURR'])
 
@@ -85,11 +85,13 @@ if y_prob[1] < y_prob[0]:
 else:
     col2.subheader(f"**Failure payment probability.**")
 
-fig = px.pie(values=y_prob, names=[0,1], color=[0,1], color_discrete_sequence=COLOR_BR_r,
+fig = px.pie(values=y_prob, names=['Success', 'Failure '], color=[0,1], color_discrete_sequence=COLOR_BR_r,
 width=230, height=230)
 fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
 # fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
 col2.plotly_chart(fig, use_container_width=True)
+
+# st.write(data_for_prediction)
 
 ### Summary plot SHAP Values ###
 
@@ -105,9 +107,6 @@ explainer = shap.TreeExplainer(Final_Model)
 st.set_option('deprecation.showPyplotGlobalUse', False)
 shap_values = explainer.shap_values(test_features)
 
-if st.button('SHAP Summary'):
-    st.pyplot(shap.summary_plot(shap_values[1], test_features, max_display=10))
-
 shap_sum = np.abs(shap_values[0]).mean(axis=0)
 
 importance_df = pd.DataFrame([test_features.columns.tolist(), shap_sum.tolist()]).T
@@ -116,16 +115,41 @@ importance_df = importance_df.sort_values('shap_importance', ascending=False)
 
 most_important_var = importance_df['column_name'][0:5].tolist()
 
-if st.button('Grahps'):
+if st.button('SHAP Summary + Related Graphics'):
+    st.pyplot(shap.summary_plot(shap_values[1], test_features, max_display=10))
     for x in most_important_var:
         st.plotly_chart(histogram(train, x=x, client=[test, input_client]), use_container_width=True)
-
-symbol = Image.open('Symbol.png')
-st.sidebar.image(symbol, use_column_width=True)
-
-st.sidebar.header('User Input parameters')
-st.sidebar.slider('DAYS_EMPLOYED', 0, 10, 5)
 
 if st.button('SHAP Values'):
     shap_values = explainer.shap_values(data_for_prediction_array)
     st_shap(shap.force_plot(explainer.expected_value[1], shap_values[1], data_for_prediction))
+
+### Sidebar ###
+
+symbol = Image.open('Symbol.png')
+st.sidebar.image(symbol, use_column_width=True)
+
+st.sidebar.header('Parameters to adjust:')
+
+def adjusted_variables():
+    var_1 = st.sidebar.slider(most_important_var[0], train[most_important_var[0]].min(), train[most_important_var[0]].max(), float(data_for_prediction[most_important_var[0]]))
+    var_2 = st.sidebar.slider(most_important_var[1], train[most_important_var[1]].min(), train[most_important_var[1]].max(), float(data_for_prediction[most_important_var[1]]))
+    var_3 = st.sidebar.slider(most_important_var[2], train[most_important_var[2]].min(), train[most_important_var[2]].max(), float(data_for_prediction[most_important_var[2]]))
+    var_4 = st.sidebar.slider(most_important_var[3], train[most_important_var[3]].min(), train[most_important_var[3]].max(), float(data_for_prediction[most_important_var[3]]))
+    var_5 = st.sidebar.slider(most_important_var[4], float(train[most_important_var[4]].min()), float(train[most_important_var[4]].max()), float(data_for_prediction[most_important_var[4]]))
+
+    dict = {most_important_var[0] : [var_1],
+            most_important_var[1] : [var_2],
+            most_important_var[2] : [var_3],
+            most_important_var[3] : [var_4],
+            most_important_var[4] : [var_5]}
+
+    data_adjusted = data_for_prediction.copy()
+
+    for key,value in dict.items():
+        data_adjusted[key] = value
+
+    return data_adjusted
+
+st.write(data_for_prediction)
+st.write(adjusted_variables())
