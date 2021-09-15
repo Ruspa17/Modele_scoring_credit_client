@@ -47,16 +47,13 @@ def histogram(df, x='str', legend=True, client=None):
 
 ### Data ###
 
-train = pd.read_csv('../Dataset/train_small.csv', nrows = 10000)
-test = pd.read_csv('../Dataset/test_small.csv', nrows = 1000)
+train = pd.read_csv('reduced_train.csv')
+test = pd.read_csv('reduced_test.csv')
 test_ID = test['SK_ID_CURR']
 test_features = test.drop(columns=['SK_ID_CURR'])
 
 with open('Final_Model.pkl', 'rb') as file:
     Final_Model = pickle.load(file)
-
-preds_proba = Final_Model.predict_proba(test_features)[:, 1]
-preds = Final_Model.predict(test_features)
 
 ### Title principal + input client ###
 
@@ -90,8 +87,6 @@ width=230, height=230)
 fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
 # fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
 col2.plotly_chart(fig, use_container_width=True)
-
-# st.write(data_for_prediction)
 
 ### Summary plot SHAP Values ###
 
@@ -153,3 +148,21 @@ def adjusted_variables():
 
 st.write(data_for_prediction)
 st.write(adjusted_variables())
+
+### Adjusted prediction ###
+
+adj = adjusted_variables()
+
+y_prob_adj = Final_Model.predict_proba(adj)
+y_prob_adj = [y_prob_adj.flatten()[0], y_prob_adj.flatten()[1]]
+
+if y_prob_adj[1] < y_prob_adj[0]:
+    col2.subheader(f"**Successful payment probability.**")
+else:
+    col2.subheader(f"**Failure payment probability.**")
+
+fig = px.pie(values=y_prob_adj, names=['Success', 'Failure '], color=[0,1], color_discrete_sequence=COLOR_BR_r,
+width=230, height=230)
+fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
+# fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
+col2.plotly_chart(fig, use_container_width=True)
