@@ -4,3 +4,4 @@ pandas
 numpy==1.20
 plotly
 shap
+lightgbm
