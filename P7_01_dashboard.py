@@ -8,8 +8,8 @@ import shap
 
 ### Functions ###
 
-COLOR_BR_r = ['dodgerblue', 'indianred']
-COLOR_BR =['#EF553B', '#00CC96']
+COLOR_BR_r = ['#00CC96', '#e03838']
+COLOR_BR =['#e03838', '#00CC96']
 
 @st.cache
 def histogram(df, x='str', legend=True, client=None):
@@ -56,6 +56,13 @@ with open('Final_Model.pkl', 'rb') as file:
     Final_Model = pickle.load(file)
 
 ### Title principal + input client ###
+
+col1, col2 = st.columns((252,1024))
+
+symbol = Image.open('Symbol.png')
+hcg = Image.open('Home Credit Group.png')
+col1.image(symbol, use_column_width=True)
+col2.image(hcg, use_column_width=True)
 
 st.write('''
 # Client's Scoring
@@ -117,16 +124,14 @@ if st.button('SHAP Summary + Related Graphics'):
 
 if st.button('SHAP Values'):
     shap_values = explainer.shap_values(data_for_prediction_array)
-    st_shap(shap.force_plot(explainer.expected_value[1], shap_values[1], data_for_prediction))
+    st_shap(shap.force_plot(explainer.expected_value[1], shap_values[1], data_for_prediction, plot_cmap=COLOR_BR_r))
 
 ### Sidebar ###
-
-symbol = Image.open('Symbol.png')
-st.sidebar.image(symbol, use_column_width=True)
 
 st.sidebar.header('Parameters to adjust:')
 
 def adjusted_variables():
+
     var_1 = st.sidebar.slider(most_important_var[0], train[most_important_var[0]].min(), train[most_important_var[0]].max(), float(data_for_prediction[most_important_var[0]]))
     var_2 = st.sidebar.slider(most_important_var[1], train[most_important_var[1]].min(), train[most_important_var[1]].max(), float(data_for_prediction[most_important_var[1]]))
     var_3 = st.sidebar.slider(most_important_var[2], train[most_important_var[2]].min(), train[most_important_var[2]].max(), float(data_for_prediction[most_important_var[2]]))
@@ -146,9 +151,6 @@ def adjusted_variables():
 
     return data_adjusted
 
-st.write(data_for_prediction)
-st.write(adjusted_variables())
-
 ### Adjusted prediction ###
 
 adj = adjusted_variables()
@@ -157,12 +159,12 @@ y_prob_adj = Final_Model.predict_proba(adj)
 y_prob_adj = [y_prob_adj.flatten()[0], y_prob_adj.flatten()[1]]
 
 if y_prob_adj[1] < y_prob_adj[0]:
-    col2.subheader(f"**Successful payment probability.**")
+    st.sidebar.subheader(f"**Successful payment probability after adjusting variables.**")
 else:
-    col2.subheader(f"**Failure payment probability.**")
+    st.sidebar.subheader(f"**Failure payment probability after adjusting variables.**")
 
 fig = px.pie(values=y_prob_adj, names=['Success', 'Failure '], color=[0,1], color_discrete_sequence=COLOR_BR_r,
 width=230, height=230)
 fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
 # fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
-col2.plotly_chart(fig, use_container_width=True)
+st.sidebar.plotly_chart(fig, use_container_width=True)
