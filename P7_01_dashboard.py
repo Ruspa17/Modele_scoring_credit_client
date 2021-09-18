@@ -76,7 +76,7 @@ of repaying a loan from [**Home Credit Default Risk**]
 
 col1, col2 = st.columns(2)
 
-input_client = col1.selectbox('Select random client ID', test_ID)
+input_client = col1.selectbox('Select Client ID', test_ID)
 
 ### Prediction ###
 
@@ -84,16 +84,16 @@ data_for_prediction = test_features[test['SK_ID_CURR']==input_client]
 y_prob = Final_Model.predict_proba(data_for_prediction)
 y_prob = [y_prob.flatten()[0], y_prob.flatten()[1]]
 
-if y_prob[1] < y_prob[0]:
-    col2.subheader(f"**Successful payment probability.**")
-else:
-    col2.subheader(f"**Failure payment probability.**")
-
 fig = px.pie(values=y_prob, names=['Success', 'Failure '], color=[0,1], color_discrete_sequence=COLOR_BR_r,
 width=230, height=230)
 fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
 # fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
 col2.plotly_chart(fig, use_container_width=True)
+
+if y_prob[1] < y_prob[0]:
+    col2.subheader('**Successful payment probability.**')
+else:
+    col2.subheader('**Failure payment probability.**')
 
 ### Summary plot SHAP Values ###
 
@@ -117,18 +117,31 @@ importance_df = importance_df.sort_values('shap_importance', ascending=False)
 
 most_important_var = importance_df['column_name'][0:5].tolist()
 
-if st.button('SHAP Summary + Related Graphics'):
-    st.pyplot(shap.summary_plot(shap_values[1], test_features, max_display=10))
-    for x in most_important_var:
-        st.plotly_chart(histogram(train, x=x, client=[test, input_client]), use_container_width=True)
+st.write(''' *** ''')
 
-if st.button('SHAP Values'):
-    shap_values = explainer.shap_values(data_for_prediction_array)
-    st_shap(shap.force_plot(explainer.expected_value[1], shap_values[1], data_for_prediction, plot_cmap=COLOR_BR_r))
+st.subheader('''**Summary plot with SHAP Values:**''')
+
+st.pyplot(shap.summary_plot(shap_values[1], test_features, max_display=10))
+
+st.write(''' *** ''')
+
+st.subheader('''**Most important variables:**''')
+
+for x in most_important_var:
+    st.plotly_chart(histogram(train, x=x, client=[test, input_client]), use_container_width=True)
+
+st.write(''' *** ''')
+
+st.subheader('''**Force plot with SHAP Values:**''')
+
+shap_values = explainer.shap_values(data_for_prediction_array)
+st_shap(shap.force_plot(explainer.expected_value[1], shap_values[1], data_for_prediction, plot_cmap=COLOR_BR_r))
+
+st.write(''' *** ''')
 
 ### Sidebar ###
 
-st.sidebar.header('Parameters to adjust:')
+st.sidebar.write('# Adjustable parameters:')
 
 def adjusted_variables():
 
@@ -158,13 +171,17 @@ adj = adjusted_variables()
 y_prob_adj = Final_Model.predict_proba(adj)
 y_prob_adj = [y_prob_adj.flatten()[0], y_prob_adj.flatten()[1]]
 
-if y_prob_adj[1] < y_prob_adj[0]:
-    st.sidebar.subheader(f"**Successful payment probability after adjusting variables.**")
-else:
-    st.sidebar.subheader(f"**Failure payment probability after adjusting variables.**")
+st.sidebar.write(''' *** ''')
+
+st.sidebar.write('# Result on predictions:')
 
 fig = px.pie(values=y_prob_adj, names=['Success', 'Failure '], color=[0,1], color_discrete_sequence=COLOR_BR_r,
 width=230, height=230)
 fig.update_layout(margin=dict(l=0, r=0, t=30, b=0))
 # fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
 st.sidebar.plotly_chart(fig, use_container_width=True)
+
+if y_prob_adj[1] < y_prob_adj[0]:
+    st.sidebar.subheader('**Successful payment probability after adjusting variables.**')
+else:
+    st.sidebar.subheader('**Failure payment probability after adjusting variables.**')
