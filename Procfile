@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run Dashboard/P7_01_dashboard.py
+web: sh setup.sh && streamlit run P7_01_dashboard.py
