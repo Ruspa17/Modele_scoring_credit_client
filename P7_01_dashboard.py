@@ -47,20 +47,20 @@ def histogram(df, x='str', legend=True, client=None):
 
 ### Data ###
 
-train = pd.read_csv('../Datasets/reduced_train.csv')
-test = pd.read_csv('../Datasets/reduced_test.csv')
+train = pd.read_csv('Datasets/reduced_train.csv')
+test = pd.read_csv('Datasets/reduced_test.csv')
 test_ID = test['SK_ID_CURR']
 test_features = test.drop(columns=['SK_ID_CURR'])
 
-with open('../Model/Final_Model.pkl', 'rb') as file:
+with open('Model/Final_Model.pkl', 'rb') as file:
     Final_Model = pickle.load(file)
 
 ### Title principal + input client ###
 
 col1, col2 = st.columns((252,1024))
 
-symbol = Image.open('../Images/Symbol.png')
-hcg = Image.open('../Images/Home Credit Group.png')
+symbol = Image.open('Images/Symbol.png')
+hcg = Image.open('Images/Home Credit Group.png')
 col1.image(symbol, use_column_width=True)
 col2.image(hcg, use_column_width=True)
 
