@@ -6,6 +6,8 @@ import pickle
 import plotly.express as px
 import shap
 
+st.set_page_config(layout="wide")
+
 ### Functions ###
 
 COLOR_BR_r = ['#00CC96', '#e03838']
@@ -69,11 +71,12 @@ st.write('''
 
 Machine learning model to predict how capable each applicant is
 of repaying a loan from [**Home Credit Default Risk**]
-(https://www.kaggle.com/c/home-credit-default-risk/data)
-
-***
+(https://www.kaggle.com/c/home-credit-default-risk/data).
 ''')
 
+st.markdown(':arrow_upper_left: Click on the left sidebar to adjust most important variables and improve the prediction score.')
+
+st.write(' *** ')
 col1, col2 = st.columns(2)
 
 input_client = col1.selectbox('Select Client ID', test_ID)
