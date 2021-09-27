@@ -5,7 +5,6 @@ import numpy as np
 import pickle
 import plotly.express as px
 import shap
-import plotly.figure_factory as ff
 
 st.set_page_config(layout="wide")
 
