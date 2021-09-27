@@ -5,6 +5,7 @@ import numpy as np
 import pickle
 import plotly.express as px
 import shap
+import plotly.figure_factory as ff
 
 st.set_page_config(layout="wide")
 
@@ -21,21 +22,23 @@ def histogram(df, x='str', legend=True, client=None):
                         x=x,
                         color="TARGET",
                         width=300,
-                        height=200,
+                        height=300,
                         category_orders={"TARGET": [1, 0]},
-                        color_discrete_sequence=COLOR_BR)
+                        color_discrete_sequence=COLOR_BR,
+                        marginal='box')
         fig.update_xaxes(showticklabels=False)
-        fig.update_layout(margin=dict(l=10, r=10, t=10, b=50))
+        fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
     else:
         fig = px.histogram(df,
                 x=x,
                 color="TARGET",
                 width=300,
-                height=200,
+                height=250,
                 category_orders={"TARGET": [1, 0]},
                 color_discrete_sequence=COLOR_BR,
                 barmode="group",
-                histnorm='percent')
+                histnorm='percent',
+                marginal='box')
         fig.update_layout(margin=dict(l=10, r=10, t=10, b=10))
     if legend == True:
         fig.update_layout(legend=dict(yanchor="top",xanchor="right"))
@@ -118,7 +121,7 @@ importance_df = pd.DataFrame([test_features.columns.tolist(), shap_sum.tolist()]
 importance_df.columns = ['column_name', 'shap_importance']
 importance_df = importance_df.sort_values('shap_importance', ascending=False)
 
-most_important_var = importance_df['column_name'][0:5].tolist()
+most_important_var = importance_df['column_name'][0:3].tolist()
 
 st.write(''' *** ''')
 
@@ -151,14 +154,14 @@ def adjusted_variables():
     var_1 = st.sidebar.slider(most_important_var[0], train[most_important_var[0]].min(), train[most_important_var[0]].max(), float(data_for_prediction[most_important_var[0]]))
     var_2 = st.sidebar.slider(most_important_var[1], train[most_important_var[1]].min(), train[most_important_var[1]].max(), float(data_for_prediction[most_important_var[1]]))
     var_3 = st.sidebar.slider(most_important_var[2], train[most_important_var[2]].min(), train[most_important_var[2]].max(), float(data_for_prediction[most_important_var[2]]))
-    var_4 = st.sidebar.slider(most_important_var[3], train[most_important_var[3]].min(), train[most_important_var[3]].max(), float(data_for_prediction[most_important_var[3]]))
-    var_5 = st.sidebar.slider(most_important_var[4], float(train[most_important_var[4]].min()), float(train[most_important_var[4]].max()), float(data_for_prediction[most_important_var[4]]))
+    #var_4 = st.sidebar.slider(most_important_var[3], train[most_important_var[3]].min(), train[most_important_var[3]].max(), float(data_for_prediction[most_important_var[3]]))
+    #var_5 = st.sidebar.slider(most_important_var[4], float(train[most_important_var[4]].min()), float(train[most_important_var[4]].max()), float(data_for_prediction[most_important_var[4]]))
 
     dict = {most_important_var[0] : [var_1],
             most_important_var[1] : [var_2],
-            most_important_var[2] : [var_3],
-            most_important_var[3] : [var_4],
-            most_important_var[4] : [var_5]}
+            most_important_var[2] : [var_3]}
+            #most_important_var[3] : [var_4],
+            #most_important_var[4] : [var_5]}
 
     data_adjusted = data_for_prediction.copy()
 
