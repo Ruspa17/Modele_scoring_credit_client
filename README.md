@@ -1,4 +1,4 @@
-# P7_Dashboard
+# Modèle de scoring pour accorder un credit
 
 **Link Dashboard:** https://dashboard-p7-scoring.herokuapp.com
 
